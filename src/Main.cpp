@@ -20,7 +20,12 @@ json decode_bencoded_value(const std::string& encoded_value) {
         } else {
             throw std::runtime_error("Invalid encoded value: " + encoded_value);
         }
-    } else {
+    } else if ('i' == encoded_value.front() && 'e' == encoded_value.back()) {
+        std::string number_string = encoded_value.substr(1, encoded_value.size() - 2);
+        int64_t number = std::stoll(number_string); // converts to int64_t, to handle the case when the number is large
+        return json(number);
+    }
+    else {
         throw std::runtime_error("Unhandled encoded value: " + encoded_value);
     }
 }

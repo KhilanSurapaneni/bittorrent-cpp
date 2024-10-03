@@ -71,6 +71,24 @@ json decode_bencoded_list(const std::string& encoded_value, size_t& position) {
     return list;  // Return the JSON array
 }
 
+json decode_bencoded_dictionary(const std::string& encoded_value, size_t& position) {
+    position++;  // Skip the 'd' character at the beginning of the dictionary
+    json dictionary = json::object();  // Initialize a JSON object to hold the decoded dictionary
+
+    // Loop through the dictionary elements until the terminating 'e' is found
+    while (encoded_value[position] != 'e') {
+        // Decode each key and add it to the dictionary
+        std::string key = decode_bencoded_string(encoded_value, position).get<std::string>();
+
+        // Decode each value and add it to the dictionary
+        dictionary[key] = decode_bencoded_value(encoded_value, position);
+    }
+    position++;  // Skip the 'e' character at the end of the dictionary
+
+    // Return the JSON object
+    return dictionary;
+}
+
 // Function to decode different bencoded values (string, integer, list)
 json decode_bencoded_value(const std::string& encoded_value, size_t& position) {
     if (std::isdigit(encoded_value[position])) {
@@ -82,6 +100,9 @@ json decode_bencoded_value(const std::string& encoded_value, size_t& position) {
     } else if (encoded_value[position] == 'l') {
         // If the current character is 'l', it's a list
         return decode_bencoded_list(encoded_value, position);
+    } else if (encoded_value[position] == 'd') {
+        // If the current character is 'd', it's a dictionary
+        return decode_bencoded_dictionary(encoded_value, position);
     } else {
         // Throw an error if the value type is not handled
         throw std::runtime_error("Unhandled encoded value: " + encoded_value);

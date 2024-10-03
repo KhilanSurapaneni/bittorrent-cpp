@@ -13,9 +13,9 @@ json decode_bencoded_value(const std::string& encoded_value) {
         // Example: "5:hello" -> "hello"
         size_t colon_index = encoded_value.find(':');
         if (colon_index != std::string::npos) {
-            std::string number_string = encoded_value.substr(0, colon_index);
-            int64_t number = std::atoll(number_string.c_str());
-            std::string str = encoded_value.substr(colon_index + 1, number);
+            std::string number_string = encoded_value.substr(0, colon_index); // Extract length of string
+            int number = std::stoi(number_string); // Convert string to integer
+            std::string str = encoded_value.substr(colon_index + 1, number); // Extract value
             return json(str);
         } else {
             throw std::runtime_error("Invalid encoded value: " + encoded_value);
@@ -43,7 +43,6 @@ int main(int argc, char* argv[]) {
             return 1;
         }
         // You can use print statements as follows for debugging, they'll be visible when running tests.
-        std::cout << "Logs from your program will appear here!" << std::endl;
 
         // Uncomment this block to pass the first stage
         std::string encoded_value = argv[2];
